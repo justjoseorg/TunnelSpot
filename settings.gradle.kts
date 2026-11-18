@@ -16,7 +16,8 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "wireguard-android"
+// Modified for PhoneHome.
+rootProject.name = "PhoneHome"
 
 include(":tunnel")
 include(":ui")

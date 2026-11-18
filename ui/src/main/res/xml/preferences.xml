@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
   ~ SPDX-License-Identifier: Apache-2.0
+  ~ Modified for PhoneHome: replace root-backend settings with Shizuku setup.
   -->
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="settings">
     <com.wireguard.android.preference.VersionPreference
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/phonehome_icon"
         android:key="version" />
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="restore_on_boot"
+    <Preference
+        android:key="hotspot_setup"
         android:singleLineTitle="false"
-        android:summaryOff="@string/restore_on_boot_summary_off"
-        android:summaryOn="@string/restore_on_boot_summary_on"
-        android:title="@string/restore_on_boot_title" />
+        android:title="@string/hotspot_setup"
+        android:summary="@string/hotspot_only" />
     <com.wireguard.android.preference.ZipExporterPreference android:key="zip_exporter" />
     <com.wireguard.android.preference.QuickTilePreference android:key="quick_tile" />
     <Preference
@@ -28,15 +27,6 @@
         android:summaryOff="@string/dark_theme_summary_off"
         android:summaryOn="@string/dark_theme_summary_on"
         android:title="@string/dark_theme_title" />
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="multiple_tunnels"
-        android:singleLineTitle="false"
-        android:summaryOff="@string/multiple_tunnels_summary_off"
-        android:summaryOn="@string/multiple_tunnels_summary_on"
-        android:title="@string/multiple_tunnels_title" />
-    <com.wireguard.android.preference.ToolsInstallerPreference android:key="tools_installer" />
-    <com.wireguard.android.preference.KernelModuleEnablerPreference android:key="kernel_module_enabler" />
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="allow_remote_control_intents"

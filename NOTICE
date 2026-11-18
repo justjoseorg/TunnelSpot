@@ -1,0 +1,20 @@
+PhoneHome
+
+PhoneHome is an independent, experimental fork of WireGuard for Android.
+It is not affiliated with or endorsed by WireGuard LLC.
+WireGuard is a registered trademark of Jason A. Donenfeld.
+
+Upstream UI, configuration handling, and tunnel implementation:
+Copyright 2017-2025 WireGuard LLC and the contributors identified in the
+individual source files. Licensed under Apache-2.0; see COPYING.
+Based on WireGuard/wireguard-android commit
+e7b3a3c1 (the full upstream history is preserved).
+
+PhoneHome additions: Copyright 2026 PhoneHome contributors.
+Licensed under Apache-2.0.
+Modified upstream files carry modification notices. Changes include branding,
+build configuration, removal of upstream automatic updating and root backend
+selection, a hotspot-only tunnel backend, and Shizuku setup/lifecycle UI.
+
+Shizuku API/provider are separate dependencies licensed under Apache-2.0.
+Other dependencies and native submodules retain their respective licenses.

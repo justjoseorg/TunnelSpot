@@ -1,6 +1,7 @@
 /*
  * Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
+ * Modified for PhoneHome: hotspot-only backend; no root or upstream updater.
  */
 package com.wireguard.android
 
@@ -18,15 +19,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.google.android.material.color.DynamicColors
 import com.wireguard.android.backend.Backend
-import com.wireguard.android.backend.GoBackend
-import com.wireguard.android.backend.WgQuickBackend
 import com.wireguard.android.configStore.FileConfigStore
 import com.wireguard.android.model.TunnelManager
-import com.wireguard.android.updater.Updater
+import com.wireguard.android.hotspot.HotspotBackend
 import com.wireguard.android.util.RootShell
 import com.wireguard.android.util.ToolsInstaller
 import com.wireguard.android.util.UserKnobs
-import com.wireguard.android.util.applicationScope
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -62,24 +60,7 @@ class Application : android.app.Application() {
     }
 
     private suspend fun determineBackend(): Backend {
-        var backend: Backend? = null
-        if (UserKnobs.enableKernelModule.first() && WgQuickBackend.hasKernelSupport()) {
-            try {
-                rootShell.start()
-                val wgQuickBackend = WgQuickBackend(applicationContext, rootShell, toolsInstaller)
-                wgQuickBackend.setMultipleTunnels(UserKnobs.multipleTunnels.first())
-                backend = wgQuickBackend
-                UserKnobs.multipleTunnels.onEach {
-                    wgQuickBackend.setMultipleTunnels(it)
-                }.launchIn(coroutineScope)
-            } catch (ignored: Exception) {
-            }
-        }
-        if (backend == null) {
-            backend = GoBackend(applicationContext)
-            GoBackend.setAlwaysOnCallback { get().applicationScope.launch { get().tunnelManager.restoreState(true) } }
-        }
-        return backend
+        return HotspotBackend(applicationContext)
     }
 
     override fun onCreate() {
@@ -116,7 +97,6 @@ class Application : android.app.Application() {
                 Log.e(TAG, Log.getStackTraceString(e))
             }
         }
-        Updater.monitorForUpdates()
 
         if (BuildConfig.DEBUG) {
             StrictMode.setVmPolicy(VmPolicy.Builder().detectAll().penaltyLog().build())

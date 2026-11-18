@@ -1,6 +1,7 @@
 /*
  * Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
+ * Modified for PhoneHome: attach wireguard-go to an externally owned test TUN.
  */
 
 package com.wireguard.android.backend;
@@ -57,6 +58,38 @@ public final class GoBackend implements Backend {
     public GoBackend(final Context context) {
         SharedLibraryLoader.loadSharedLibrary(context, "wg-go");
         this.context = context;
+    }
+
+    /**
+     * Consumes a test-network TUN descriptor without creating a device-wide Android VPN.
+     * The caller must stop tethering before closing this tunnel.
+     */
+    public synchronized void startExternal(final Tunnel tunnel, final Config config,
+                                           final ParcelFileDescriptor descriptor) throws Exception {
+        if (currentTunnel != null)
+            throw new IllegalStateException("Stop the previous hotspot tunnel first");
+        for (final Peer peer : config.getPeers()) {
+            if (peer.getEndpoint().isPresent() && !peer.getEndpoint().get().getResolved().isPresent())
+                throw new BackendException(Reason.DNS_RESOLUTION_FAILURE);
+        }
+        currentTunnelHandle = wgTurnOn(tunnel.getName(), descriptor.detachFd(), config.toWgUserspaceString());
+        if (currentTunnelHandle < 0)
+            throw new BackendException(Reason.GO_ACTIVATION_ERROR_CODE, currentTunnelHandle);
+        currentConfig = config;
+        currentTunnel = tunnel;
+        tunnel.onStateChange(State.UP);
+    }
+
+    public synchronized void stopExternal() {
+        if (currentTunnelHandle == -1)
+            return;
+        final Tunnel tunnel = currentTunnel;
+        wgTurnOff(currentTunnelHandle);
+        currentTunnelHandle = -1;
+        currentTunnel = null;
+        currentConfig = null;
+        if (tunnel != null)
+            tunnel.onStateChange(State.DOWN);
     }
 
     /**

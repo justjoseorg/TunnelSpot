@@ -1,6 +1,7 @@
 /*
  * Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
+ * Modified for PhoneHome: fork identity and hotspot backend description.
  */
 package com.wireguard.android.preference
 
@@ -16,6 +17,7 @@ import com.wireguard.android.R
 import com.wireguard.android.backend.Backend
 import com.wireguard.android.backend.GoBackend
 import com.wireguard.android.backend.WgQuickBackend
+import com.wireguard.android.hotspot.HotspotBackend
 import com.wireguard.android.util.ErrorMessages
 import com.wireguard.android.util.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -27,11 +29,11 @@ class VersionPreference(context: Context, attrs: AttributeSet?) : Preference(con
 
     override fun getSummary() = versionSummary
 
-    override fun getTitle() = context.getString(R.string.version_title, BuildConfig.VERSION_NAME)
+    override fun getTitle() = context.getString(R.string.phonehome_version, BuildConfig.VERSION_NAME)
 
     override fun onClick() {
         val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = Uri.parse("https://www.wireguard.com/")
+        intent.data = Uri.parse("https://github.com/justjoseorg/PhoneHome")
         try {
             context.startActivity(intent)
         } catch (e: Throwable) {
@@ -43,6 +45,7 @@ class VersionPreference(context: Context, attrs: AttributeSet?) : Preference(con
         private fun getBackendPrettyName(context: Context, backend: Backend) = when (backend) {
             is WgQuickBackend -> context.getString(R.string.type_name_kernel_module)
             is GoBackend -> context.getString(R.string.type_name_go_userspace)
+            is HotspotBackend -> context.getString(R.string.phonehome_backend)
             else -> ""
         }
     }

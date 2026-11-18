@@ -1,6 +1,7 @@
 /*
  * Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
+ * Modified for PhoneHome: Shizuku setup entry and first-launch explanation.
  */
 package com.wireguard.android.activity
 
@@ -19,6 +20,7 @@ import com.wireguard.android.R
 import com.wireguard.android.fragment.TunnelDetailFragment
 import com.wireguard.android.fragment.TunnelEditorFragment
 import com.wireguard.android.model.ObservableTunnel
+import com.wireguard.android.hotspot.SetupActivity
 
 /**
  * CRUD interface for WireGuard tunnels. This activity serves as the main entry point to the
@@ -63,6 +65,10 @@ class MainActivity : BaseActivity(), FragmentManager.OnBackStackChangedListener 
         supportFragmentManager.addOnBackStackChangedListener(this)
         backPressedCallback = onBackPressedDispatcher.addCallback(this) { handleBackPressed() }
         onBackStackChanged()
+        if (savedInstanceState == null &&
+            !getSharedPreferences("phonehome", MODE_PRIVATE).getBoolean("setup_seen", false)) {
+            startActivity(Intent(this, SetupActivity::class.java))
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -72,6 +78,10 @@ class MainActivity : BaseActivity(), FragmentManager.OnBackStackChangedListener 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.menu_hotspot -> {
+                startActivity(Intent(this, SetupActivity::class.java))
+                true
+            }
             android.R.id.home -> {
                 // The back arrow in the action bar should act the same as the back button.
                 onBackPressedDispatcher.onBackPressed()

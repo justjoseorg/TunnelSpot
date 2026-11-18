@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
   ~ SPDX-License-Identifier: Apache-2.0
+  ~ Modified for PhoneHome: phone applications never enter the gateway.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -253,8 +254,8 @@
                             android:nextFocusUp="@id/dns_servers_text"
                             android:nextFocusDown="@id/peers_layout"
                             android:nextFocusForward="@id/peers_layout"
-                            android:onClick="@{fragment::onRequestSetExcludedIncludedApplications}"
-                            android:text="@{config.interface.includedApplications.size > 0 ? @plurals/set_included_applications(config.interface.includedApplications.size, config.interface.includedApplications.size) : config.interface.excludedApplications.size > 0 ? @plurals/set_excluded_applications(config.interface.excludedApplications.size, config.interface.excludedApplications.size) : @string/all_applications}"
+                            android:clickable="false"
+                            android:text="@string/hotspot_only"
                             android:textColor="?attr/colorSecondary"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"

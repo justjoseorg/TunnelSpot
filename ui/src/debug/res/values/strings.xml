@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Modified for PhoneHome branding. -->
 <resources>
-    <string name="app_name" translatable="false">WireGuard β</string>
+    <string name="app_name" translatable="false">PhoneHome</string>
 </resources>

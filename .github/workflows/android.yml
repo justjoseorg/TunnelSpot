@@ -1,0 +1,54 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Install Android SDK
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;28.2.13676358" "cmake;3.22.1"
+      - name: Test, lint, and build installable APK
+        run: ./gradlew :tunnel:testDebugUnitTest :ui:testDebugUnitTest :ui:lintDebug :ui:assembleDebug --console=plain
+      - name: Name APK and calculate checksum
+        run: |
+          mkdir -p dist
+          cp ui/build/outputs/apk/debug/ui-debug.apk dist/PhoneHome.apk
+          cd dist
+          sha256sum PhoneHome.apk > PhoneHome.apk.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PhoneHome-apk
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Android-reports
+          path: |
+            ui/build/reports/
+            tunnel/build/reports/tests/
+          if-no-files-found: ignore

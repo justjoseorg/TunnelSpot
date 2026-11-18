@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
   ~ SPDX-License-Identifier: Apache-2.0
+  ~ Modified for PhoneHome: Shizuku and hotspot session service.
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,11 +9,13 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission
-        android:name="android.permission.SYSTEM_ALERT_WINDOW"
-        android:minSdkVersion="34" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28"
@@ -41,14 +44,31 @@
     <application
         android:name=".Application"
         android:allowBackup="false"
-        android:banner="@mipmap/banner"
+        android:banner="@drawable/phonehome_icon"
         android:enableOnBackInvokedCallback="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/phonehome_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/phonehome_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <service android:name="com.wireguard.android.backend.GoBackend$VpnService" tools:node="remove" />
+        <activity
+            android:name=".hotspot.SetupActivity"
+            android:exported="false"
+            android:label="@string/hotspot_setup" />
+        <service
+            android:name=".hotspot.HotspotSessionService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:enabled="true"
+            android:exported="true"
+            android:multiprocess="false"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+        <meta-data android:name="moe.shizuku.client.V3_SUPPORT" android:value="true" />
         <activity
             android:name=".activity.TunnelToggleActivity"
             android:excludeFromRecents="true"
@@ -96,11 +116,7 @@
         <activity
             android:name=".activity.LogViewerActivity"
             android:exported="false"
-            android:label="@string/log_viewer_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
+            android:label="@string/log_viewer_title" />
 
         <provider
             android:name=".activity.LogViewerActivity$ExportedLogContentProvider"
@@ -161,6 +177,7 @@
     </application>
 
     <queries>
+        <package android:name="moe.shizuku.privileged.api" />
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />

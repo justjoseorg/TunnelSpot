@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Existing upstream Persian translation omits its numeric placeholder. -->
+<issues format="6" by="lint 9.1.0" type="baseline">
+    <issue
+        id="StringFormatInvalid"
+        message="Format string 'quick_settings_tile_add_failure' is not a valid format string so it should not be passed to String.format">
+        <location file="src/main/java/com/wireguard/android/preference/QuickTilePreference.kt" line="46" />
+        <location file="src/main/res/values-fa-rIR/strings.xml" line="190" />
+    </issue>
+</issues>

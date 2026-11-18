@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
   ~ SPDX-License-Identifier: Apache-2.0
+  ~ Modified for PhoneHome setup entry.
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_hotspot"
+        android:orderInCategory="999"
+        android:title="@string/hotspot_setup"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_settings"
         android:alphabeticShortcut="s"

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
   ~ SPDX-License-Identifier: Apache-2.0
+  ~ Modified for PhoneHome: always show hotspot-only routing.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -284,8 +285,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:labelFor="@+id/applications_text"
-                        android:text="@string/applications"
-                        android:visibility="@{config.interface.includedApplications.isEmpty() &amp;&amp; config.interface.excludedApplications.isEmpty() ? android.view.View.GONE : android.view.View.VISIBLE}"
+                        android:text="@string/hotspot_setup"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/listen_port_mtu_barrier" />
 
@@ -298,9 +298,8 @@
                         android:nextFocusDown="@id/peers_layout"
                         android:nextFocusForward="@id/peers_layout"
                         android:onClick="@{ClipboardUtils::copyTextView}"
-                        android:text="@{config.interface.includedApplications.isEmpty() ? @plurals/n_excluded_applications(config.interface.excludedApplications.size(), config.interface.excludedApplications.size()) : @plurals/n_included_applications(config.interface.includedApplications.size(), config.interface.includedApplications.size())}"
+                        android:text="@string/hotspot_only"
                         android:textAppearance="?attr/textAppearanceBodyLarge"
-                        android:visibility="@{config.interface.includedApplications.isEmpty() &amp;&amp; config.interface.excludedApplications.isEmpty() ? android.view.View.GONE : android.view.View.VISIBLE}"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/applications_label"
                         tools:text="8 excluded" />

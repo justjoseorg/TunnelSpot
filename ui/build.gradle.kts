@@ -1,4 +1,5 @@
 @file:Suppress("UnstableApiUsage")
+// Modified for PhoneHome: distinct identity, Shizuku bridge, and gateway tests.
 
 val pkg: String = providers.gradleProperty("wireguardPackageName").get()
 
@@ -13,11 +14,13 @@ android {
         buildConfig = true
         dataBinding = true
         viewBinding = true
+        aidl = true
     }
     namespace = pkg
     defaultConfig {
-        applicationId = pkg
-        minSdk = 24
+        applicationId = "org.justjose.phonehome"
+        minSdk = 33
+        targetSdk = 36
         versionCode = providers.gradleProperty("wireguardVersionCode").get().toInt()
         versionName = providers.gradleProperty("wireguardVersionName").get()
         buildConfigField("int", "MIN_SDK_VERSION", minSdk.toString())
@@ -53,6 +56,7 @@ android {
         generateLocaleConfig = true
     }
     lint {
+        baseline = file("lint-baseline.xml")
         disable += "LongLogTag"
         warning += "MissingTranslation"
         warning += "ImpliedQuantity"
@@ -75,6 +79,9 @@ dependencies {
     implementation(libs.google.material)
     implementation(libs.zxing.android.embedded)
     implementation(libs.kotlinx.coroutines.android)
+    implementation("dev.rikka.shizuku:api:13.1.5")
+    implementation("dev.rikka.shizuku:provider:13.1.5")
+    testImplementation(libs.junit)
     coreLibraryDesugaring(libs.desugarJdkLibs)
 }
 
@@ -82,3 +89,10 @@ tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-Xlint:unchecked")
     options.isDeprecation = true
 }
+
+val preparePhoneHomeNotices by tasks.registering(Copy::class) {
+    from(rootProject.file("COPYING"), rootProject.file("NOTICE"))
+    into(layout.buildDirectory.dir("generated/phonehomeAssets/licenses"))
+}
+android.sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/phonehomeAssets").get().asFile)
+tasks.named("preBuild") { dependsOn(preparePhoneHomeNotices) }

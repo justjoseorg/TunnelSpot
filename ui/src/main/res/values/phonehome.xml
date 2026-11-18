@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="phonehome_version">PhoneHome v%s</string>
+    <string name="phonehome_backend" translatable="false">WireGuard / Shizuku</string>
+    <string name="hotspot_setup">Hotspot setup</string>
+    <string name="hotspot_only">Hotspot devices only · Phone apps bypass WireGuard</string>
+    <string name="hotspot_intro">PhoneHome sends Wi-Fi hotspot clients through your selected WireGuard profile. The phone itself keeps its normal internet connection. No root and no software or proxy settings on clients.</string>
+    <string name="hotspot_requirements">Experimental · Android 13+\n\n1. Install Shizuku and start it using Wireless debugging (or ADB). Restart Shizuku after each phone reboot.\n2. Authorize PhoneHome below.\n3. Set your Wi-Fi hotspot name and password in Android settings, then leave the hotspot off.\n4. Import a WireGuard profile with an IPv4 address, IPv4 DNS server, and AllowedIPs = 0.0.0.0/0. Toggle it on to start both WireGuard and the hotspot.\n\nThis version shares IPv4 (TCP, UDP and DNS). Native IPv6 is not advertised. Providers must supply a standard WireGuard config; OpenVPN and proprietary VPN apps are not supported.\n\nHidden tethering APIs vary by device. PhoneHome checks the selected upstream and attempts to stop Wi-Fi sharing if it changes. This is NOT a guaranteed system kill switch: Android may briefly fall back to another upstream, especially if a process crashes. Do not rely on it for leak-sensitive use until verified on your device.</string>
+    <string name="hotspot_shizuku_install">Install / start Shizuku</string>
+    <string name="hotspot_authorize">Authorize PhoneHome</string>
+    <string name="hotspot_settings">Wi-Fi hotspot settings</string>
+    <string name="hotspot_ready">Shizuku authorized. Import a profile, then turn its switch on.</string>
+    <string name="hotspot_no_shizuku">Start Shizuku first, then return here.</string>
+    <string name="hotspot_permission_needed">Authorize PhoneHome in Hotspot setup first.</string>
+    <string name="hotspot_permission_denied">Shizuku permission was not granted.</string>
+    <string name="hotspot_channel">VPN hotspot session</string>
+    <string name="hotspot_starting">Starting WireGuard hotspot…</string>
+    <string name="hotspot_active">Hotspot routed through %s</string>
+    <string name="hotspot_stopped">Hotspot stopped</string>
+    <string name="hotspot_stop">Stop hotspot + WireGuard</string>
+    <string name="hotspot_error">Hotspot error: %s</string>
+    <string name="hotspot_open">Open PhoneHome</string>
+    <string name="hotspot_done">Continue to profiles</string>
+    <string name="hotspot_source">Source code and licenses</string>
+    <string name="hotspot_attribution">Independent fork of WireGuard for Android. Not affiliated with WireGuard LLC. Apache-2.0; license and attribution are included in this APK under assets/licenses.</string>
+</resources>

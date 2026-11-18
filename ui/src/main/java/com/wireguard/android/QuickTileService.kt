@@ -1,18 +1,18 @@
 /*
  * Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
+ * Modified for PhoneHome: no overlay permission or device-VPN permission flow.
  */
 package com.wireguard.android
 
 import android.app.PendingIntent
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Icon
-import android.net.Uri
 import android.os.Build
 import android.os.IBinder
-import android.provider.Settings
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.util.Log
@@ -20,7 +20,6 @@ import androidx.annotation.RequiresApi
 import androidx.databinding.Observable
 import androidx.databinding.Observable.OnPropertyChangedCallback
 import com.wireguard.android.activity.MainActivity
-import com.wireguard.android.activity.TunnelToggleActivity
 import com.wireguard.android.backend.Tunnel
 import com.wireguard.android.model.ObservableTunnel
 import com.wireguard.android.util.applicationScope
@@ -61,12 +60,7 @@ class QuickTileService : TileService() {
                     Log.d(TAG, "No tunnel set, so launching main activity")
                     val intent = Intent(this@QuickTileService, MainActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                        startActivityAndCollapse(PendingIntent.getActivity(this@QuickTileService, 0, intent, PendingIntent.FLAG_IMMUTABLE))
-                    } else {
-                        @Suppress("DEPRECATION")
-                        startActivityAndCollapse(intent)
-                    }
+                    openActivity(intent)
                 }
 
                 else -> {
@@ -77,28 +71,24 @@ class QuickTileService : TileService() {
                                 updateTile()
                             } catch (e: Throwable) {
                                 Log.d(TAG, "Failed to set state, so falling back", e)
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && !Settings.canDrawOverlays(this@QuickTileService)) {
-                                    Log.d(TAG, "Need overlay permissions")
-                                    val permissionIntent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                                    permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    startActivityAndCollapse(
-                                        PendingIntent.getActivity(
-                                            this@QuickTileService,
-                                            0,
-                                            permissionIntent,
-                                            PendingIntent.FLAG_IMMUTABLE
-                                        )
-                                    )
-                                    return@launch
-                                }
-                                val toggleIntent = Intent(this@QuickTileService, TunnelToggleActivity::class.java)
-                                toggleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                startActivity(toggleIntent)
+                                openActivity(Intent(this@QuickTileService, MainActivity::class.java)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    @SuppressLint("StartActivityAndCollapseDeprecated")
+    @Suppress("DEPRECATION")
+    private fun openActivity(intent: Intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startActivityAndCollapse(PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE))
+        } else {
+            // Android 13 has no PendingIntent overload.
+            startActivityAndCollapse(intent)
         }
     }
 
