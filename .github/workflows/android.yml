@@ -56,3 +56,31 @@ jobs:
             ui/build/reports/
             tunnel/build/reports/tests/
           if-no-files-found: ignore
+
+  release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: PhoneHome-apk
+          path: dist
+      - name: Verify APK checksum
+        working-directory: dist
+        run: sha256sum -c PhoneHome.apk.sha256
+      - name: Publish experimental release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_TAG" \
+            --verify-tag \
+            --prerelease \
+            --title "PhoneHome $RELEASE_TAG (experimental)" \
+            --notes "Experimental, debug-signed Android APK. Requires Android 13+ and Shizuku (no root). Intended to route Wi-Fi hotspot clients through WireGuard while phone apps keep their normal connection. IPv4 only. Not yet verified on a physical Android device; no guaranteed leak-proof kill switch. Debug signing keys may change between builds, so upgrades may require exporting profiles and uninstalling the previous build. See the README for setup and limitations." \
+            dist/PhoneHome.apk dist/PhoneHome.apk.sha256

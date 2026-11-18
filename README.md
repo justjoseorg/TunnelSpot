@@ -81,7 +81,12 @@ That establishes feasibility, **not device verification of PhoneHome**.
 
 ## APK and GitHub Actions
 
-Open [Actions → Android APK](https://github.com/justjoseorg/PhoneHome/actions/workflows/android.yml),
+Download `PhoneHome.apk` directly from
+[Releases](https://github.com/justjoseorg/PhoneHome/releases).
+Version tags (`v*`) automatically publish an **experimental prerelease** with
+the APK and SHA-256 checksum, only after the build, tests, and lint succeed.
+
+For branch builds, open [Actions → Android APK](https://github.com/justjoseorg/PhoneHome/actions/workflows/android.yml),
 select a successful run, and download **PhoneHome-apk**. Extract `PhoneHome.apk`
 and install it. A SHA-256 checksum is included.
 
