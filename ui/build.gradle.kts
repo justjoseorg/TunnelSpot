@@ -92,6 +92,9 @@ tasks.withType<JavaCompile>().configureEach {
 
 val preparePhoneHomeNotices by tasks.registering(Copy::class) {
     from(rootProject.file("COPYING"), rootProject.file("NOTICE"))
+    from(rootProject.file("tunnel/tools/wireguard-tools/COPYING")) {
+        rename { "wireguard-tools-GPL-2.0.txt" }
+    }
     into(layout.buildDirectory.dir("generated/phonehomeAssets/licenses"))
 }
 android.sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/phonehomeAssets").get().asFile)

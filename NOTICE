@@ -18,3 +18,13 @@ selection, a hotspot-only tunnel backend, and Shizuku setup/lifecycle UI.
 
 Shizuku API/provider are separate dependencies licensed under Apache-2.0.
 Other dependencies and native submodules retain their respective licenses.
+
+The wireguard-go engine is Copyright 2017-2025 WireGuard LLC, MIT licensed.
+Go and golang.org/x dependencies are Copyright The Go Authors, BSD licensed.
+Their license texts are included under assets/licenses in the APK.
+
+The standalone wg and wg-quick native executables inherited from upstream are
+GPL-2.0 licensed and are not used by PhoneHome's no-root backend. Their license
+is also included under assets/licenses. Corresponding source is the pinned
+tunnel/tools/wireguard-tools submodule, with build scripts in this repository.
+Clone the repository with --recurse-submodules to obtain these sources.
