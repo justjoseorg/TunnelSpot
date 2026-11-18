@@ -82,5 +82,5 @@ jobs:
             --verify-tag \
             --prerelease \
             --title "PhoneHome $RELEASE_TAG (experimental)" \
-            --notes "Experimental, debug-signed Android APK. Requires Android 13+ and Shizuku (no root). Intended to route Wi-Fi hotspot clients through WireGuard while phone apps keep their normal connection. IPv4 only. Not yet verified on a physical Android device; no guaranteed leak-proof kill switch. Debug signing keys may change between builds, so upgrades may require exporting profiles and uninstalling the previous build. See the README for setup and limitations." \
+            --notes "Experimental, debug-signed Android APK. Requires Android 13+ and initial Wireless debugging pairing using the built-in setup. No root, Shizuku, or companion app required. Intended to route Wi-Fi hotspot clients through WireGuard while phone apps keep their normal connection. IPv4 only. Not yet verified on a physical Android device; no guaranteed leak-proof kill switch. Debug signing keys may change between builds, so upgrades may require exporting profiles and uninstalling the previous build. See the README for setup and limitations." \
             dist/PhoneHome.apk dist/PhoneHome.apk.sha256

@@ -10,7 +10,8 @@ Android device. Do not treat this as a proven leak-proof VPN gateway.**
 
 ## What goes through WireGuard?
 
-Only devices connected to the phone's **Wi-Fi hotspot**. Phone apps keep their
+**Intended behavior (device verification pending):** Only devices connected to
+the phone's **Wi-Fi hotspot**. Phone apps keep their
 normal connection. Clients do not install an app or configure a proxy.
 PhoneHome does not create an Android `VpnService`, change app include/exclude
 lists, or change the phone's default network.
@@ -25,11 +26,19 @@ proprietary provider apps are not implemented.
 
 1. Android **13 or newer**, with Wi-Fi tethering and compatible test-network
    APIs. OEM support is not guaranteed.
-2. Install [Shizuku](https://shizuku.rikka.app/download/) and start it using
-   [Wireless debugging or ADB](https://shizuku.rikka.app/guide/setup/).
-   **No root required.** Wireless debugging is needed for setup, not on clients.
-   Shizuku must be restarted after each phone reboot.
-3. Open PhoneHome → **Hotspot setup** → **Authorize PhoneHome**.
+2. Enable Developer options (tap Build number seven times in Android settings)
+   and **Wireless debugging** while the phone is connected to Wi-Fi.
+   **No root, Shizuku installation, companion APK, or computer is required.**
+3. Open PhoneHome → **Hotspot setup** → **Start pairing notification** and
+   allow notifications. In Android's Wireless debugging screen, choose
+   **Pair device with pairing code**. Keep the dialog open; pull down
+   notifications and enter its six-digit code in PhoneHome's notification.
+   Alternatively, use split screen to enter the pairing port and code manually.
+   Return to PhoneHome and tap **Start built-in helper**. If discovery fails,
+   enter the connection port from the main Wireless debugging screen (not the
+   temporary pairing port). After startup you can disable Wireless debugging.
+   Restart the helper after reboot, app restart, or update; an unused helper
+   exits after ten minutes. Pair again if Android forgets the app.
 4. Configure the hotspot SSID/password in Android's hotspot settings. Leave the
    hotspot **off** before starting PhoneHome. PhoneHome uses the system's saved
    credentials; it does not collect or store the Wi-Fi password.
@@ -41,12 +50,29 @@ proprietary provider apps are not implemented.
    The notification or the same switch stops both.
 
 All imported private keys remain in the app's private storage, as in upstream;
-Android backups are disabled. They are never sent to the Shizuku helper.
+Android backups are disabled. They are never sent to the shell helper.
 Profiles are **not additionally encrypted at rest**.
+
+Pairing grants this app **ADB shell privileges**, broader than normal Android
+permissions. Only pair your own device. The built-in ADB client always connects
+to `127.0.0.1`; discovery accepts only local services. Its RSA identity is stored
+encrypted with an Android Keystore AES-GCM key in non-backed-up app storage.
+Pairing uses Android's TLS/SPAKE protocol, with a 30-second transport deadline.
+The ADB connection is closed after helper startup; there is no remote-command
+UI or network listener accepting remote clients. To revoke access, forget
+PhoneHome under **Wireless debugging → Paired devices**. Stop the hotspot and
+helper before clearing app data or uninstalling. Owner-user installs are the
+target; secondary users/work profiles have not been validated.
 
 ## How no-root sharing is possible
 
-A Shizuku shell-UID user service uses Android's hidden `TestNetworkManager` to
+The embedded ADB client launches an `app_process` helper as **shell UID 2000**,
+never root. A shell-only, `DUMP`-protected provider accepts its Binder only
+during startup using a random, single-use 256-bit challenge and matching app
+version. The helper checks callers against the owning app UID and exposes
+only fixed hotspot operations, not a general shell interface.
+
+That helper uses Android's hidden `TestNetworkManager` to
 create a TUN with the WireGuard profile's IPv4 address. The app attaches the
 upstream `wireguard-go` engine directly to that file descriptor. The helper
 uses `TetheringManager.setPreferTestNetworks(true)` to select the test network
@@ -68,7 +94,7 @@ Wi-Fi before dismantling the test network on normal teardown and watches the
 app's Binder lifetime in the helper.
 
 **This cannot guarantee a zero-leak kill switch.** There may be a fallback
-window before detection, especially on a process crash, Shizuku loss, reboot,
+window before detection, especially on a process crash, helper loss, reboot,
 phone call, or network change. Do not use this for leak-sensitive traffic.
 Other tethered transports are outside this version's protection.
 If shutdown cannot be confirmed, turn the system hotspot off manually.
@@ -116,13 +142,15 @@ formatting issue. New lint errors still fail the build.
 
 ## Device acceptance checklist (not yet executed)
 
-On a compatible phone, authorize **ADB-started Shizuku (UID 2000)**, import a
+On a compatible phone, pair the built-in ADB client and start its helper, import a
 real provider profile, and start PhoneHome. Verify on a hotspot client that
 public IPv4 and DNS use the provider; exercise TCP and UDP. On the phone verify
 its public IPv4 stays on the original connection and there is no system VPN
 session. Confirm native IPv6 cannot escape on the client. Then test switching
 profiles, stopping from the notification, losing upstream, an incoming phone
-call, killing the app/helper, revoking Shizuku, and rebooting. Inspect Android
+call, killing the app/helper, forgetting the ADB pairing, and rebooting. Verify
+that disabling Wireless debugging after startup does not end the session.
+Inspect Android
 tethering state and packet captures for fallback; a successful APK build
 does not validate these behaviors.
 
@@ -132,3 +160,12 @@ Forked from [WireGuard/wireguard-android](https://github.com/WireGuard/wireguard
 preserving its UI and upstream history. Independent project, not an official
 WireGuard product. See [NOTICE](NOTICE), [COPYING](COPYING), and individual
 source/submodule licenses.
+
+The embedded [libadb-android 3.1.1](https://github.com/MuntashirAkon/libadb-android/tree/3.1.1)
+is used under its Apache-2.0 licensing option, with Conscrypt 2.5.3 (Apache-2.0)
+and Bouncy Castle 1.81 (MIT).
+Its [spake2-android 2.2.1](https://github.com/MuntashirAkon/spake2-java/tree/2.2.1)
+dependency is LGPL-3.0. Unmodified corresponding sources, license texts,
+dependency versions, and instructions for rebuilding/replacing the embedded
+library are included in `assets/licenses` and linked there. JitPack is scoped
+only to these two dependency groups.

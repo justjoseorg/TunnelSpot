@@ -1,7 +1,7 @@
 /*
  * Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
- * Modified for PhoneHome: Shizuku setup entry and first-launch explanation.
+ * Modified for PhoneHome: built-in ADB setup entry and first-launch explanation.
  */
 package com.wireguard.android.activity
 

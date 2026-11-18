@@ -14,6 +14,9 @@ import android.net.NetworkSpecifier
 import android.os.Binder
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
+import android.os.Parcel
+import android.os.Process
+import android.os.SystemClock
 import androidx.annotation.Keep
 import java.lang.reflect.Proxy
 import java.net.InetAddress
@@ -23,10 +26,10 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 /**
- * Runs as Shizuku's shell UID, not root. Private keys never cross this Binder interface.
+ * Runs as the local ADB shell UID, not root. Only the owning app can call it.
  */
 @Keep
-class ShizukuHotspotService : IHotspotService.Stub() {
+class ShellHotspotService(private val appUid: Int) : IHotspotService.Stub() {
     private val context: Context by lazy {
         val activityThread = Class.forName("android.app.ActivityThread")
         val thread = activityThread.getMethod("currentActivityThread").invoke(null)
@@ -53,6 +56,7 @@ class ShizukuHotspotService : IHotspotService.Stub() {
     @Volatile private var wifiTethered = false
     @Volatile private var failure: String? = null
     @Volatile private var tetheringSnapshotReceived = false
+    private var idleDeadline = SystemClock.elapsedRealtime() + 600_000
 
     init {
         executor.scheduleWithFixedDelay(::monitor, 1, 1, TimeUnit.SECONDS)
@@ -60,6 +64,10 @@ class ShizukuHotspotService : IHotspotService.Stub() {
 
     @Synchronized
     private fun monitor() {
+        if (owner == null && descriptor == null && SystemClock.elapsedRealtime() > idleDeadline) {
+            destroy()
+            return
+        }
         if (owner?.isBinderAlive == false) {
             runCatching { stop() }.onSuccess { destroy() }
             return
@@ -127,7 +135,7 @@ class ShizukuHotspotService : IHotspotService.Stub() {
             }
             connectivity.requestNetwork(request, keepAlive!!)
             val properties = LinkProperties().apply {
-                setInterfaceName(this@ShizukuHotspotService.interfaceName)
+                setInterfaceName(this@ShellHotspotService.interfaceName)
                 setMtu(mtu)
                 dns.forEach {
                     LinkProperties::class.java.getMethod("addDnsServer", InetAddress::class.java)
@@ -142,7 +150,7 @@ class ShizukuHotspotService : IHotspotService.Stub() {
             ParcelFileDescriptor.dup(descriptor!!.fileDescriptor)
         } catch (e: Exception) {
             runCatching { releaseNetwork() }
-            throw IllegalStateException("This device could not prepare a Shizuku hotspot: ${reason(e)}")
+            throw IllegalStateException("This device could not prepare an ADB hotspot: ${reason(e)}")
         }
     }
 
@@ -213,10 +221,16 @@ class ShizukuHotspotService : IHotspotService.Stub() {
     }
 
     override fun destroy() {
-        runCatching { stop() }
+        stop()
         executor.shutdownNow()
         callbackExecutor.shutdownNow()
         kotlin.system.exitProcess(0)
+    }
+
+    override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
+        val caller = Binder.getCallingUid()
+        check(caller == appUid || caller == Process.myUid()) { "Caller does not own this PhoneHome helper." }
+        return super.onTransact(code, data, reply, flags)
     }
 
     @Synchronized
@@ -270,6 +284,7 @@ class ShizukuHotspotService : IHotspotService.Stub() {
         interfaceName = null
         upstream = null
         tetheringSnapshotReceived = false
+        idleDeadline = SystemClock.elapsedRealtime() + 600_000
         check(problems.isEmpty()) { "Wi-Fi is off, but test-network cleanup was incomplete: ${problems.joinToString("; ")}" }
     }
 

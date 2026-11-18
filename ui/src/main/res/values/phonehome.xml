@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="phonehome_version">PhoneHome v%s</string>
-    <string name="phonehome_backend" translatable="false">WireGuard / Shizuku</string>
+    <string name="phonehome_backend" translatable="false">WireGuard / Built-in ADB</string>
     <string name="hotspot_setup">Hotspot setup</string>
     <string name="hotspot_only">Hotspot devices only · Phone apps bypass WireGuard</string>
     <string name="hotspot_intro">PhoneHome sends Wi-Fi hotspot clients through your selected WireGuard profile. The phone itself keeps its normal internet connection. No root and no software or proxy settings on clients.</string>
-    <string name="hotspot_requirements">Experimental · Android 13+\n\n1. Install Shizuku and start it using Wireless debugging (or ADB). Restart Shizuku after each phone reboot.\n2. Authorize PhoneHome below.\n3. Set your Wi-Fi hotspot name and password in Android settings, then leave the hotspot off.\n4. Import a WireGuard profile with an IPv4 address, IPv4 DNS server, and AllowedIPs = 0.0.0.0/0. Toggle it on to start both WireGuard and the hotspot.\n\nThis version shares IPv4 (TCP, UDP and DNS). Native IPv6 is not advertised. Providers must supply a standard WireGuard config; OpenVPN and proprietary VPN apps are not supported.\n\nHidden tethering APIs vary by device. PhoneHome checks the selected upstream and attempts to stop Wi-Fi sharing if it changes. This is NOT a guaranteed system kill switch: Android may briefly fall back to another upstream, especially if a process crashes. Do not rely on it for leak-sensitive use until verified on your device.</string>
-    <string name="hotspot_shizuku_install">Install / start Shizuku</string>
-    <string name="hotspot_authorize">Authorize PhoneHome</string>
+    <string name="hotspot_requirements">Experimental · Android 13+\n\nSet your Wi-Fi hotspot name and password in Android settings, then leave the hotspot off. Import a WireGuard profile with an IPv4 address, IPv4 DNS server, and AllowedIPs = 0.0.0.0/0. Toggle it on to start both WireGuard and the hotspot.\n\nThe built-in helper runs as Android ADB shell, not root. After helper startup you can disable Wireless debugging; hotspot control uses Binder, not a persistent ADB connection. Restart the helper after reboot, app restart, or app update. Pair again if Android forgets this app. No Shizuku or other companion app is needed.\n\nThis version shares IPv4 (TCP, UDP and DNS). Native IPv6 is not advertised. Providers must supply a standard WireGuard config; OpenVPN and proprietary VPN apps are not supported.\n\nHidden tethering APIs vary by device. PhoneHome checks the selected upstream and attempts to stop Wi-Fi sharing if it changes. This is NOT a guaranteed system kill switch: Android may briefly fall back to another upstream, especially if a process crashes. Do not rely on it for leak-sensitive use until verified on your device.</string>
     <string name="hotspot_settings">Wi-Fi hotspot settings</string>
-    <string name="hotspot_ready">Shizuku authorized. Import a profile, then turn its switch on.</string>
-    <string name="hotspot_no_shizuku">Start Shizuku first, then return here.</string>
-    <string name="hotspot_permission_needed">Authorize PhoneHome in Hotspot setup first.</string>
-    <string name="hotspot_permission_denied">Shizuku permission was not granted.</string>
+    <string name="hotspot_ready">Built-in helper connected. You can turn Wireless debugging off. Import a profile, then turn its switch on.</string>
     <string name="hotspot_channel">VPN hotspot session</string>
     <string name="hotspot_starting">Starting WireGuard hotspot…</string>
     <string name="hotspot_active">Hotspot routed through %s</string>
@@ -23,4 +18,28 @@
     <string name="hotspot_done">Continue to profiles</string>
     <string name="hotspot_source">Source code and licenses</string>
     <string name="hotspot_attribution">Independent fork of WireGuard for Android. Not affiliated with WireGuard LLC. Apache-2.0; license and attribution are included in this APK under assets/licenses.</string>
+    <string name="adb_helper_needed">Start the built-in helper below. No root or Shizuku installation is required. An unused helper stops after ten minutes.</string>
+    <string name="adb_setup_steps">1. Enable Developer options (tap Build number seven times in Android settings), then enable Wireless debugging while connected to Wi-Fi.\n2. Tap Start pairing notification below. In Wireless debugging, open Pair device with pairing code. Keep that dialog open; pull down notifications and enter its six-digit code in the PhoneHome notification.\n3. Return here and tap Start built-in helper. Discovery finds the local connection port; enter the port from the main Wireless debugging screen if discovery fails. This is NOT the pairing port.\n4. After the helper connects, turn Wireless debugging off. The helper stays available until stopped or the app/phone restarts.\n\nPairing authorizes this app with ADB shell privileges, broader than a normal app. PhoneHome connects only to this phone (127.0.0.1); it provides no remote shell or arbitrary command entry. Its ADB identity is encrypted using Android Keystore and excluded from backup. To revoke access, forget PhoneHome under Wireless debugging → Paired devices.</string>
+    <string name="adb_open_settings">Open Wireless debugging</string>
+    <string name="adb_pair_notification">Start pairing notification</string>
+    <string name="adb_manual_pairing">Manual alternative (split screen): keep Android’s pairing dialog open beside PhoneHome and enter its port and code below. Pairing ports and codes expire when the dialog closes.</string>
+    <string name="adb_pairing_port">Pairing port (manual alternative)</string>
+    <string name="adb_connection_port">Connection port (optional; blank = discover)</string>
+    <string name="adb_code">Six-digit pairing code</string>
+    <string name="adb_pair_manual">Pair using port and code</string>
+    <string name="adb_start_helper">Start built-in helper</string>
+    <string name="adb_stop_helper">Stop hotspot and built-in helper</string>
+    <string name="adb_helper_starting">Discovering local ADB and starting the helper…</string>
+    <string name="adb_helper_stopping">Stopping the hotspot and helper…</string>
+    <string name="adb_setup_error">Setup failed: %s</string>
+    <string name="adb_notifications_needed">Allow notifications for pairing, or use the split-screen manual alternative.</string>
+    <string name="adb_pairing_channel">PhoneHome wireless ADB pairing</string>
+    <string name="adb_pairing_waiting">Open Wireless debugging → Pair device with pairing code. Keep the dialog open; return to this notification to enter the code.</string>
+    <string name="adb_pairing_found">Local pairing service found. Tap Enter code and submit the six-digit code while Android’s pairing dialog stays open.</string>
+    <string name="adb_pairing_missing">Pairing dialog is no longer available. Open a new pairing dialog and try again.</string>
+    <string name="adb_pairing_busy">Pairing with Android’s local ADB service…</string>
+    <string name="adb_pairing_failed">Pairing failed. Open a new pairing dialog and try again. If discovery is unavailable, use manual split-screen pairing.</string>
+    <string name="adb_paired">Paired. Return to PhoneHome and tap Start built-in helper.</string>
+    <string name="adb_enter_code">Enter code</string>
+    <string name="adb_cancel">Cancel pairing</string>
 </resources>

@@ -1,7 +1,7 @@
 /*
  * Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
- * Modified for PhoneHome: hide root-only backend preferences.
+ * Modified for PhoneHome: built-in ADB setup instead of root-only preferences.
  */
 package com.wireguard.android.activity
 

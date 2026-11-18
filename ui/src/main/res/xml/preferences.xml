@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
   ~ SPDX-License-Identifier: Apache-2.0
-  ~ Modified for PhoneHome: replace root-backend settings with Shizuku setup.
+  ~ Modified for PhoneHome: replace root-backend settings with built-in ADB setup.
   -->
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="settings">

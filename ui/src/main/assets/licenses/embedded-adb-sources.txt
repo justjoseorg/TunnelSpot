@@ -1,0 +1,53 @@
+Embedded ADB / cryptography dependencies
+======================================
+
+PhoneHome uses unmodified libadb-android 3.1.1 under its Apache-2.0 option:
+https://github.com/MuntashirAkon/libadb-android/tree/3.1.1
+Commit: c849886ebc6d48e7b46d967e78a6bb65c90c3b74
+Its corresponding source and per-file copyright/license notices are in
+sources/libadb-android-3.1.1.tgz. The Apache license is also in COPYING;
+additional MIT and BSD-3-Clause license texts are included alongside this file.
+
+libadb uses spake2-android 2.2.1 (LGPL-3.0):
+https://github.com/MuntashirAkon/spake2-java/tree/2.2.1
+Its unmodified source is in sources/spake2-java-2.2.1.tgz.
+The pinned native submodule source is in:
+sources/spake2-c-0d15933e5ba3e662cb01245a7ac0dc9fca3eac31.tgz
+https://github.com/MuntashirAkon/spake2-c/tree/0d15933e5ba3e662cb01245a7ac0dc9fca3eac31
+The LGPL-3.0 and incorporated GPL-3.0 texts are included in this directory.
+Per-file copyright notices, native third-party notices, Gradle wrapper and
+build scripts are included in these source archives.
+
+Rebuilding/replacing the LGPL library:
+1. Extract the spake2-java archive, then extract the spake2-c archive into
+   android/src/main/cpp/spake2-c inside that source tree (remove its archive
+   top-level directory when extracting).
+2. With the Android SDK/NDK and Java version required by that tree, follow its
+   README/build scripts to build a replacement Android AAR. Alternatively:
+   git clone --recurse-submodules https://github.com/MuntashirAkon/spake2-java.git
+   cd spake2-java
+   git checkout 2.2.1
+   git submodule update --init --recursive
+   ./gradlew :android:assembleRelease
+3. Clone PhoneHome with its submodules. In ui/build.gradle.kts, exclude
+   com.github.MuntashirAkon.spake2-java:spake2-android from the libadb dependency,
+   then add implementation(files("/path/to/replacement.aar")).
+4. Run PhoneHome's build commands in README.md to regenerate the complete APK.
+   The app sources and build scripts are Apache-2.0 and permit this relinking.
+   You may reverse engineer the combined work to debug your modifications to
+   the LGPL portions. There is no signature check preventing replacement.
+5. Sign/install your rebuilt APK using your own key. Export profiles before
+   uninstalling a differently signed build. A fresh install must pair with
+   Android again. No proprietary signing key or device-unlock key is needed.
+
+Other embedded crypto libraries:
+- Conscrypt 2.5.3: Apache-2.0, Copyright The Android Open Source Project.
+  https://github.com/google/conscrypt/tree/2.5.3
+  See Conscrypt-LICENSE.txt, Conscrypt-NOTICE.txt and its Harmony/Netty notices.
+  Its native BoringSSL/OpenSSL third-party notices are in BoringSSL-LICENSE.txt.
+- Bouncy Castle 1.81: MIT, Copyright The Legion of the Bouncy Castle Inc.
+  https://github.com/bcgit/bc-java/tree/r1rv81
+  See BouncyCastle-LICENSE.html.
+
+PhoneHome's bootstrap/provider/helper code is separate from these libraries;
+no Shizuku application or Shizuku client library is included.
