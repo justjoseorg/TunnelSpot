@@ -35,7 +35,7 @@ object HelperBridge {
     }
 
     fun requireService(): IHotspotService = service?.takeIf { it.asBinder().isBinderAlive }
-        ?: error("Start the built-in helper in Hotspot setup. No Shizuku app is needed.")
+        ?: error("Start the built-in helper in Hotspot setup.")
 
     fun start(context: Context, connectionPort: Int? = null): IHotspotService {
         val (future, token) = synchronized(lock) {
@@ -51,7 +51,7 @@ object HelperBridge {
             // Close ADB after the authenticated Binder is returned; the helper survives independently.
             LocalAdb(context).use { adb ->
                 check(adb.connectLocal(port)) {
-                    "Could not connect. Pair PhoneHome first, then use the Wireless debugging connection port (not the pairing port)."
+                    "Could not connect. Pair TunnelSpot first, then use the Wireless debugging connection port (not the pairing port)."
                 }
                 val command = AdbInputs.launchCommand(context.applicationInfo.sourceDir, context.packageName,
                     token, Process.myUid())

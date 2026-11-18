@@ -23,7 +23,7 @@ object AdbInputs {
         require(token.matches(Regex("[0-9a-f]{64}")))
         fun quote(value: String) = "'" + value.replace("'", "'\\''") + "'"
         return "CLASSPATH=${quote(apk)} nohup /system/bin/app_process /system/bin " +
-            "--nice-name=phonehome_helper com.wireguard.android.hotspot.adb.ShellHelperMain " +
+            "--nice-name=tunnelspot_helper com.wireguard.android.hotspot.adb.ShellHelperMain " +
             "${quote(packageName)} ${quote(token)} $uid > /dev/null 2>&1 < /dev/null &"
     }
 }

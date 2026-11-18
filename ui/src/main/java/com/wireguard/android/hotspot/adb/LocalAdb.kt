@@ -27,7 +27,7 @@ class LocalAdb(context: Context) : AbsAdbConnectionManager() {
     }
     override fun getPrivateKey(): PrivateKey = identity.privateKey
     override fun getCertificate(): Certificate = identity.certificate
-    override fun getDeviceName(): String = "PhoneHome"
+    override fun getDeviceName(): String = "TunnelSpot"
     // The library caches its TLS context, so do not destroy its in-memory identity on disconnect.
     override fun close() {
         synchronized(relayLock) {

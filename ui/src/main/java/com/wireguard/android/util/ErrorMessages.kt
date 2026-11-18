@@ -1,6 +1,7 @@
 /*
  * Copyright © 2017-2025 WireGuard LLC. All Rights Reserved.
  * SPDX-License-Identifier: Apache-2.0
+ * Modified for PhoneHome: preserve hotspot startup phase and cleanup diagnostics.
  */
 package com.wireguard.android.util
 
@@ -11,6 +12,7 @@ import com.google.zxing.NotFoundException
 import com.wireguard.android.Application
 import com.wireguard.android.R
 import com.wireguard.android.backend.BackendException
+import com.wireguard.android.hotspot.HotspotStartupException
 import com.wireguard.android.util.RootShell.RootShellException
 import com.wireguard.config.BadConfigException
 import com.wireguard.config.InetEndpoint
@@ -147,7 +149,7 @@ object ErrorMessages {
         var cause = throwable
         while (cause.cause != null) {
             if (cause is BadConfigException || cause is BackendException ||
-                cause is RootShellException
+                cause is RootShellException || cause is HotspotStartupException
             ) break
             val nextCause = cause.cause!!
             if (nextCause is RemoteException) break

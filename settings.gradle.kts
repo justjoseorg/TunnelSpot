@@ -24,7 +24,7 @@ dependencyResolutionManagement {
 }
 
 // Modified for PhoneHome.
-rootProject.name = "PhoneHome"
+rootProject.name = "TunnelSpot"
 
 include(":tunnel")
 include(":ui")

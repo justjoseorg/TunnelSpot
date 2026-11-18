@@ -33,7 +33,7 @@ class VersionPreference(context: Context, attrs: AttributeSet?) : Preference(con
 
     override fun onClick() {
         val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = Uri.parse("https://github.com/justjoseorg/PhoneHome")
+        intent.data = Uri.parse("https://github.com/justjoseorg/TunnelSpot")
         try {
             context.startActivity(intent)
         } catch (e: Throwable) {

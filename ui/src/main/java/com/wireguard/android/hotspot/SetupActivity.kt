@@ -119,7 +119,7 @@ class SetupActivity : AppCompatActivity() {
         text(R.string.hotspot_requirements, 15f)
         text(R.string.hotspot_attribution, 14f)
         button(R.string.hotspot_source) {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/justjoseorg/PhoneHome")))
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/justjoseorg/TunnelSpot")))
         }
         button(R.string.hotspot_done) {
             getSharedPreferences("phonehome", MODE_PRIVATE).edit().putBoolean("setup_seen", true).apply()
@@ -152,6 +152,10 @@ class SetupActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (::status.isInitialized && !busy && HelperBridge.ready()) status.setText(R.string.hotspot_ready)
+        if (::status.isInitialized && !busy) {
+            val helper = getString(if (HelperBridge.ready()) R.string.hotspot_ready else R.string.adb_helper_needed)
+            val problem = HotspotBackend.instance?.lastProblem
+            status.text = if (problem == null) helper else getString(R.string.hotspot_last_problem, helper, problem)
+        }
     }
 }

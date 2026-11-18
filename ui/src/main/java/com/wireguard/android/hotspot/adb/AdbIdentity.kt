@@ -68,7 +68,7 @@ data class AdbIdentity(val privateKey: PrivateKey, val certificate: Certificate)
             }
             val pair = KeyPairGenerator.getInstance("RSA").apply { initialize(2048) }.generateKeyPair()
             val provider = BouncyCastleProvider()
-            val subject = X500Name("CN=PhoneHome Wireless ADB")
+            val subject = X500Name("CN=TunnelSpot Wireless ADB")
             val now = System.currentTimeMillis()
             val certificate = JcaX509CertificateConverter().setProvider(provider).getCertificate(
                 JcaX509v3CertificateBuilder(subject, BigInteger(160, SecureRandom()),

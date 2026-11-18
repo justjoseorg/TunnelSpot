@@ -1,7 +1,7 @@
 Embedded ADB / cryptography dependencies
 ======================================
 
-PhoneHome uses unmodified libadb-android 3.1.1 under its Apache-2.0 option:
+TunnelSpot uses unmodified libadb-android 3.1.1 under its Apache-2.0 option:
 https://github.com/MuntashirAkon/libadb-android/tree/3.1.1
 Commit: c849886ebc6d48e7b46d967e78a6bb65c90c3b74
 Its corresponding source and per-file copyright/license notices are in
@@ -29,10 +29,10 @@ Rebuilding/replacing the LGPL library:
    git checkout 2.2.1
    git submodule update --init --recursive
    ./gradlew :android:assembleRelease
-3. Clone PhoneHome with its submodules. In ui/build.gradle.kts, exclude
+3. Clone TunnelSpot with its submodules. In ui/build.gradle.kts, exclude
    com.github.MuntashirAkon.spake2-java:spake2-android from the libadb dependency,
    then add implementation(files("/path/to/replacement.aar")).
-4. Run PhoneHome's build commands in README.md to regenerate the complete APK.
+4. Run TunnelSpot's build commands in README.md to regenerate the complete APK.
    The app sources and build scripts are Apache-2.0 and permit this relinking.
    You may reverse engineer the combined work to debug your modifications to
    the LGPL portions. There is no signature check preventing replacement.
@@ -49,5 +49,5 @@ Other embedded crypto libraries:
   https://github.com/bcgit/bc-java/tree/r1rv81
   See BouncyCastle-LICENSE.html.
 
-PhoneHome's bootstrap/provider/helper code is separate from these libraries;
-no Shizuku application or Shizuku client library is included.
+TunnelSpot's bootstrap/provider/helper code is separate from these libraries;
+no companion application is required.

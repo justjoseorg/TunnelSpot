@@ -39,12 +39,12 @@ jobs:
       - name: Name APK and calculate checksum
         run: |
           mkdir -p dist
-          cp ui/build/outputs/apk/debug/ui-debug.apk dist/PhoneHome.apk
+          cp ui/build/outputs/apk/debug/ui-debug.apk dist/TunnelSpot.apk
           cd dist
-          sha256sum PhoneHome.apk > PhoneHome.apk.sha256
+          sha256sum TunnelSpot.apk > TunnelSpot.apk.sha256
       - uses: actions/upload-artifact@v4
         with:
-          name: PhoneHome-apk
+          name: TunnelSpot-apk
           path: dist/
           if-no-files-found: error
           retention-days: 30
@@ -67,11 +67,11 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: PhoneHome-apk
+          name: TunnelSpot-apk
           path: dist
       - name: Verify APK checksum
         working-directory: dist
-        run: sha256sum -c PhoneHome.apk.sha256
+        run: sha256sum -c TunnelSpot.apk.sha256
       - name: Publish experimental release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -81,6 +81,6 @@ jobs:
           gh release create "$RELEASE_TAG" \
             --verify-tag \
             --prerelease \
-            --title "PhoneHome $RELEASE_TAG (experimental)" \
-            --notes "Experimental, debug-signed Android APK. Requires Android 13+ and initial Wireless debugging pairing using the built-in setup. No root, Shizuku, or companion app required. Intended to route Wi-Fi hotspot clients through WireGuard while phone apps keep their normal connection. IPv4 only. Not yet verified on a physical Android device; no guaranteed leak-proof kill switch. Debug signing keys may change between builds, so upgrades may require exporting profiles and uninstalling the previous build. See the README for setup and limitations." \
-            dist/PhoneHome.apk dist/PhoneHome.apk.sha256
+            --title "TunnelSpot $RELEASE_TAG (experimental)" \
+            --notes "Experimental, debug-signed Android APK. Requires Android 13+ and initial Wireless debugging pairing using the built-in setup. No root or companion app required. Intended to route Wi-Fi hotspot clients through WireGuard while phone apps keep their normal connection. IPv4 only. Gateway behavior has not been verified on a physical Android device; no guaranteed leak-proof kill switch. Debug signing keys may change between builds, so upgrades may require exporting profiles and uninstalling the previous build. See the README for setup and limitations." \
+            dist/TunnelSpot.apk dist/TunnelSpot.apk.sha256

@@ -1,6 +1,6 @@
-PhoneHome
+TunnelSpot (formerly PhoneHome)
 
-PhoneHome is an independent, experimental fork of WireGuard for Android.
+TunnelSpot is an independent, experimental fork of WireGuard for Android.
 It is not affiliated with or endorsed by WireGuard LLC.
 WireGuard is a registered trademark of Jason A. Donenfeld.
 
@@ -14,7 +14,8 @@ PhoneHome additions: Copyright 2026 PhoneHome contributors.
 Licensed under Apache-2.0.
 Modified upstream files carry modification notices. Changes include branding,
 build configuration, removal of upstream automatic updating and root backend
-selection, a hotspot-only tunnel backend, and embedded ADB setup/lifecycle UI.
+selection, a hotspot-only tunnel backend, embedded ADB setup/lifecycle UI, and
+the TunnelSpot rename. The Android application ID is retained for compatibility.
 
 libadb-android 3.1.1 is Copyright Muntashir Al-Islam and contributors, used
 under its Apache-2.0 licensing option. Included portions have BSD-3-Clause
@@ -24,7 +25,7 @@ Its native BoringSSL/OpenSSL notices are included under assets/licenses.
 Bouncy Castle 1.81 is Copyright The Legion of the Bouncy Castle Inc., MIT.
 spake2-android 2.2.1 is Copyright Muntashir Al-Islam and contributors,
 LGPL-3.0. Corresponding source and rebuilding information are distributed
-under assets/licenses. No Shizuku API/provider is included.
+under assets/licenses.
 Other dependencies and native submodules retain their respective licenses.
 
 The wireguard-go engine is Copyright 2017-2025 WireGuard LLC, MIT licensed.
@@ -32,7 +33,7 @@ Go and golang.org/x dependencies are Copyright The Go Authors, BSD licensed.
 Their license texts are included under assets/licenses in the APK.
 
 The standalone wg and wg-quick native executables inherited from upstream are
-GPL-2.0 licensed and are not used by PhoneHome's no-root backend. Their license
+GPL-2.0 licensed and are not used by TunnelSpot's no-root backend. Their license
 is also included under assets/licenses. Corresponding source is the pinned
 tunnel/tools/wireguard-tools submodule, with build scripts in this repository.
 Clone the repository with --recurse-submodules to obtain these sources.

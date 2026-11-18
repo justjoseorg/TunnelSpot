@@ -7,6 +7,7 @@ package com.wireguard.android.hotspot
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.DeadObjectException
 import androidx.core.content.ContextCompat
 import com.wireguard.android.backend.Backend
 import com.wireguard.android.backend.GoBackend
@@ -20,6 +21,8 @@ class HotspotBackend(private val context: Context) : Backend {
     @Volatile private var service: IHotspotService? = null
     private var currentTunnel: Tunnel? = null
     private var currentConfig: Config? = null
+    @Volatile var lastProblem: String? = null
+        private set
     init { instance = this }
 
     @Synchronized override fun getRunningTunnelNames(): Set<String> = engine.runningTunnelNames
@@ -42,26 +45,30 @@ class HotspotBackend(private val context: Context) : Backend {
         val settings = GatewayConfig.validate(config)
         if (currentTunnel === tunnel && currentConfig == config &&
             runCatching { service?.status() == "" }.getOrDefault(false)) return Tunnel.State.UP
+        lastProblem = null
         HelperBridge.requireService()
         if (currentTunnel != null) stopSession()
         ContextCompat.startForegroundService(context, Intent(context, HotspotSessionService::class.java))
+        var stage = "Connecting to the built-in helper"
         try {
             val helper = connect()
+            stage = "Preparing the hotspot test network"
             helper.prepare(settings.addresses, settings.dns, settings.mtu, lifetime).use { descriptor ->
+                stage = "Starting the WireGuard engine"
                 engine.startExternal(tunnel, config, descriptor)
             }
             currentTunnel = tunnel
             currentConfig = config
+            stage = "Starting Wi-Fi tethering"
             helper.startHotspot()
             return Tunnel.State.UP
         } catch (e: Exception) {
-            try {
-                stop()
-            } catch (cleanup: Exception) {
-                e.addSuppressed(cleanup)
-                throw IllegalStateException("Startup failed and hotspot shutdown is unconfirmed. Turn off Wi-Fi hotspot in Android settings.", e)
-            }
-            throw e
+            val helperDied = e is DeadObjectException || !HelperBridge.ready()
+            var cleanup: Exception? = null
+            try { stop() } catch (failure: Exception) { cleanup = failure }
+            val failure = HotspotStartupException(stage, e, helperDied, cleanup)
+            lastProblem = failure.message
+            throw failure
         }
     }
 

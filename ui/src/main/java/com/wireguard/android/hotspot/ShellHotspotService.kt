@@ -30,13 +30,7 @@ import java.util.concurrent.TimeUnit
  */
 @Keep
 class ShellHotspotService(private val appUid: Int) : IHotspotService.Stub() {
-    private val context: Context by lazy {
-        val activityThread = Class.forName("android.app.ActivityThread")
-        val thread = activityThread.getMethod("currentActivityThread").invoke(null)
-            ?: activityThread.getMethod("systemMain").invoke(null)
-        val system = activityThread.getMethod("getSystemContext").invoke(thread) as Context
-        system.createPackageContext("com.android.shell", 0)
-    }
+    private val context: Context by lazy { ShellContext.create() }
     private val connectivity by lazy { context.getSystemService(ConnectivityManager::class.java)!! }
     private val tethering by lazy { context.getSystemService("tethering") ?: error("No tethering service") }
     private val testManager by lazy { context.getSystemService("test_network") ?: error("No test-network service") }
@@ -82,7 +76,7 @@ class ShellHotspotService(private val appUid: Int) : IHotspotService.Stub() {
 
     @Synchronized
     override fun prepare(addresses: Array<String>, dns: Array<String>, mtu: Int, owner: IBinder): ParcelFileDescriptor = shell {
-        check(descriptor == null) { "A PhoneHome session already exists." }
+        check(descriptor == null) { "A TunnelSpot session already exists." }
         failure = null
         try {
             // Probe every required hidden API before changing tethering state.
@@ -104,7 +98,7 @@ class ShellHotspotService(private val appUid: Int) : IHotspotService.Stub() {
                 .invoke(tethering, callbackExecutor, eventCallback)
             await("Android did not report tethering state.") { tetheringSnapshotReceived }
             check(!wifiTethered && wifiApState() in listOf(11, 14)) {
-                "Turn off the existing Wi-Fi hotspot before starting PhoneHome."
+                "Turn off the existing Wi-Fi hotspot before starting TunnelSpot."
             }
 
             this.owner = owner
@@ -146,7 +140,7 @@ class ShellHotspotService(private val appUid: Int) : IHotspotService.Stub() {
                 Boolean::class.javaPrimitiveType, IBinder::class.java)
                 .invoke(testManager, properties, true, networkToken)
             check(available.await(12, TimeUnit.SECONDS)) { "Android did not bring up the test network." }
-            check(owner.isBinderAlive) { "PhoneHome disconnected during setup." }
+            check(owner.isBinderAlive) { "TunnelSpot disconnected during setup." }
             ParcelFileDescriptor.dup(descriptor!!.fileDescriptor)
         } catch (e: Exception) {
             runCatching { releaseNetwork() }
@@ -229,7 +223,7 @@ class ShellHotspotService(private val appUid: Int) : IHotspotService.Stub() {
 
     override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
         val caller = Binder.getCallingUid()
-        check(caller == appUid || caller == Process.myUid()) { "Caller does not own this PhoneHome helper." }
+        check(caller == appUid || caller == Process.myUid()) { "Caller does not own this TunnelSpot helper." }
         return super.onTransact(code, data, reply, flags)
     }
 
@@ -306,7 +300,7 @@ class ShellHotspotService(private val appUid: Int) : IHotspotService.Stub() {
             when (method.name) {
                 "hashCode" -> System.identityHashCode(instance)
                 "equals" -> instance === args?.getOrNull(0)
-                "toString" -> "PhoneHome-${type.simpleName}"
+                "toString" -> "TunnelSpot-${type.simpleName}"
                 else -> { callback(method.name, args); null }
             }
         }

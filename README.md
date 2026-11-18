@@ -1,4 +1,4 @@
-# PhoneHome
+# TunnelSpot
 
 An **experimental, no-root Android WireGuard hotspot** using the official
 WireGuard Android interface. Save multiple profiles, import `.conf`/ZIP files or
@@ -13,7 +13,7 @@ Android device. Do not treat this as a proven leak-proof VPN gateway.**
 **Intended behavior (device verification pending):** Only devices connected to
 the phone's **Wi-Fi hotspot**. Phone apps keep their
 normal connection. Clients do not install an app or configure a proxy.
-PhoneHome does not create an Android `VpnService`, change app include/exclude
+TunnelSpot does not create an Android `VpnService`, change app include/exclude
 lists, or change the phone's default network.
 
 This version carries **IPv4 TCP, UDP, and DNS**. It does not advertise an IPv6
@@ -28,24 +28,24 @@ proprietary provider apps are not implemented.
    APIs. OEM support is not guaranteed.
 2. Enable Developer options (tap Build number seven times in Android settings)
    and **Wireless debugging** while the phone is connected to Wi-Fi.
-   **No root, Shizuku installation, companion APK, or computer is required.**
-3. Open PhoneHome → **Hotspot setup** → **Start pairing notification** and
+   **No root, companion APK, or computer is required.**
+3. Open TunnelSpot → **Hotspot setup** → **Start pairing notification** and
    allow notifications. In Android's Wireless debugging screen, choose
    **Pair device with pairing code**. Keep the dialog open; pull down
-   notifications and enter its six-digit code in PhoneHome's notification.
+   notifications and enter its six-digit code in TunnelSpot's notification.
    Alternatively, use split screen to enter the pairing port and code manually.
-   Return to PhoneHome and tap **Start built-in helper**. If discovery fails,
+   Return to TunnelSpot and tap **Start built-in helper**. If discovery fails,
    enter the connection port from the main Wireless debugging screen (not the
    temporary pairing port). After startup you can disable Wireless debugging.
    Restart the helper after reboot, app restart, or update; an unused helper
    exits after ten minutes. Pair again if Android forgets the app.
 4. Configure the hotspot SSID/password in Android's hotspot settings. Leave the
-   hotspot **off** before starting PhoneHome. PhoneHome uses the system's saved
+   hotspot **off** before starting TunnelSpot. TunnelSpot uses the system's saved
    credentials; it does not collect or store the Wi-Fi password.
 5. Import a WireGuard profile with exactly one IPv4 interface address, an IPv4
    DNS server, `AllowedIPs = 0.0.0.0/0`, and MTU 1280–1500 (default 1280).
    A dual-stack profile is accepted, but this gateway uses its IPv4 address.
-6. Turn the profile on. PhoneHome prepares its tunnel, starts Wi-Fi sharing, and
+6. Turn the profile on. TunnelSpot prepares its tunnel, starts Wi-Fi sharing, and
    checks Android selected the tunnel upstream. Connect clients to the saved SSID.
    The notification or the same switch stops both.
 
@@ -60,7 +60,7 @@ encrypted with an Android Keystore AES-GCM key in non-backed-up app storage.
 Pairing uses Android's TLS/SPAKE protocol, with a 30-second transport deadline.
 The ADB connection is closed after helper startup; there is no remote-command
 UI or network listener accepting remote clients. To revoke access, forget
-PhoneHome under **Wireless debugging → Paired devices**. Stop the hotspot and
+TunnelSpot under **Wireless debugging → Paired devices**. Stop the hotspot and
 helper before clearing app data or uninstalling. Owner-user installs are the
 target; secondary users/work profiles have not been validated.
 
@@ -88,7 +88,7 @@ Only one saved profile is active at a time; switching stops the old hotspot firs
 
 These are **hidden, device-dependent APIs**, not a supported Android VPN-sharing
 contract. Setup may fail, an OEM may deny access, or Android may temporarily
-select cellular/Wi-Fi as upstream. PhoneHome checks upstream callbacks and
+select cellular/Wi-Fi as upstream. TunnelSpot checks upstream callbacks and
 polls every second, and attempts to stop Wi-Fi if selection changes. It stops
 Wi-Fi before dismantling the test network on normal teardown and watches the
 app's Binder lifetime in the helper.
@@ -98,22 +98,22 @@ window before detection, especially on a process crash, helper loss, reboot,
 phone call, or network change. Do not use this for leak-sensitive traffic.
 Other tethered transports are outside this version's protection.
 If shutdown cannot be confirmed, turn the system hotspot off manually.
-Do not run another test-network tethering app alongside PhoneHome: the
+Do not run another test-network tethering app alongside TunnelSpot: the
 preferred-test-network setting is global and is reset to false on normal stop.
 
 The approach was informed by current Android platform sources and discussion
-of [Shizuku test-network tethering](https://github.com/Mygod/VPNHotspot/issues/789).
-That establishes feasibility, **not device verification of PhoneHome**.
+of [test-network tethering](https://github.com/Mygod/VPNHotspot/issues/789).
+That establishes feasibility, **not device verification of TunnelSpot**.
 
 ## APK and GitHub Actions
 
-Download `PhoneHome.apk` directly from
-[Releases](https://github.com/justjoseorg/PhoneHome/releases).
+Download `TunnelSpot.apk` directly from
+[Releases](https://github.com/justjoseorg/TunnelSpot/releases).
 Version tags (`v*`) automatically publish an **experimental prerelease** with
 the APK and SHA-256 checksum, only after the build, tests, and lint succeed.
 
-For branch builds, open [Actions → Android APK](https://github.com/justjoseorg/PhoneHome/actions/workflows/android.yml),
-select a successful run, and download **PhoneHome-apk**. Extract `PhoneHome.apk`
+For branch builds, open [Actions → Android APK](https://github.com/justjoseorg/TunnelSpot/actions/workflows/android.yml),
+select a successful run, and download **TunnelSpot-apk**. Extract `TunnelSpot.apk`
 and install it. A SHA-256 checksum is included.
 
 Every push to `main`, `v*` tag, pull request, and manual workflow run executes
@@ -127,8 +127,8 @@ or file manager when prompted.
 ## Build locally
 
 ```sh
-git clone --recurse-submodules https://github.com/justjoseorg/PhoneHome.git
-cd PhoneHome
+git clone --recurse-submodules https://github.com/justjoseorg/TunnelSpot.git
+cd TunnelSpot
 # JDK 21, Android SDK 36, NDK 28.2.13676358, CMake 3.22.1
 export ANDROID_HOME=/path/to/android-sdk
 sdkmanager "platforms;android-36" "build-tools;36.0.0" \
@@ -142,8 +142,14 @@ formatting issue. New lint errors still fail the build.
 
 ## Device acceptance checklist (not yet executed)
 
+If startup fails, return to **Hotspot setup**. It shows whether the helper is
+still connected and the last startup failure, including whether preparation,
+the WireGuard engine, or Wi-Fi tethering failed. A permission error does not
+necessarily mean the helper crashed. Starting the helper is not an end-to-end
+hotspot compatibility check.
+
 On a compatible phone, pair the built-in ADB client and start its helper, import a
-real provider profile, and start PhoneHome. Verify on a hotspot client that
+real provider profile, and start TunnelSpot. Verify on a hotspot client that
 public IPv4 and DNS use the provider; exercise TCP and UDP. On the phone verify
 its public IPv4 stays on the original connection and there is no system VPN
 session. Confirm native IPv6 cannot escape on the client. Then test switching
